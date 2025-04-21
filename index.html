@@ -11,40 +11,37 @@
 
     <style>
         body {
-            font-family: 'Georgia', serif; /* Fuente más clásica */
+            font-family: 'Georgia', serif;
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-color: #fdfaf3; /* Fondo tipo pergamino claro */
-            color: #4a3f35; /* Marrón oscuro para texto */
+            background-color: #fdfaf3;
+            color: #4a3f35;
         }
         h1 {
             margin-top: 20px;
             margin-bottom: 20px;
-            color: #6b4f3a; /* Marrón más oscuro */
+            color: #6b4f3a;
             text-align: center;
             font-weight: normal;
-            border-bottom: 1px solid #dcd0b8; /* Línea sutil bajo el título */
+            border-bottom: 1px solid #dcd0b8;
             padding-bottom: 10px;
         }
-        /* Contenedor del mapa */
         #map {
             height: 85vh;
             width: 96%;
             max-width: 1400px;
-            border: 1px solid #c8bba4; /* Borde tipo pergamino */
-            border-radius: 5px; /* Menos redondeado */
+            border: 1px solid #c8bba4;
+            border-radius: 5px;
             box-shadow: 0 3px 8px rgba(0,0,0,0.1);
             margin-bottom: 25px;
-            background-color: #e6f0f2; /* Color base agua/mapa claro */
+            background-color: #e6f0f2;
         }
-
-        /* Estilo para los popups de Leaflet */
         .leaflet-popup-content-wrapper {
             border-radius: 3px;
-            background-color: #fffef8; /* Fondo popup pergamino */
+            background-color: #fffef8;
             border: 1px solid #dcd0b8;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
@@ -52,50 +49,65 @@
             font-size: 1.05em;
             line-height: 1.6;
             color: #4a3f35;
-            padding: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 12px 15px;
         }
         .leaflet-popup-content b.popup-title {
             font-size: 1.2em;
-            color: #8b4513; /* Marrón siena */
+            color: #8b4513;
             display: block;
             margin-bottom: 8px;
             border-bottom: 1px dashed #dcd0b8;
             padding-bottom: 5px;
         }
         .popup-section {
-            margin-top: 10px;
-            padding-top: 5px;
+            margin-top: 12px;
+            padding-top: 8px;
             border-top: 1px solid #eee8d8;
         }
         .popup-section h4 {
-            margin: 5px 0;
+            margin: 5px 0 3px 0;
             font-size: 0.9em;
             color: #6b4f3a;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        .popup-section p, .popup-section i {
+        .popup-section p, .popup-section .content-text { /* Usar clase para contenido */
             font-size: 0.95em;
             margin: 0;
+            display: block; /* Asegurar bloque */
         }
-         .popup-section i { /* Estilo para placeholders */
-            color: #9a8b7c;
+         .popup-section .content-text.quote { /* Estilo específico para cita */
+            font-style: italic;
+            color: #6a5acd; /* Color diferente para cita */
+            margin-top: 3px;
          }
-
-        /* Estilo para los tooltips */
+         .popup-section .content-text.notes { /* Estilo específico para notas */
+             color: #9a8b7c;
+             margin-top: 3px;
+         }
+         .popup-section a {
+             color: #0056b3;
+             text-decoration: none;
+             font-size: 0.9em; /* Enlace más pequeño */
+             display: inline-block; /* Para margen */
+             margin-top: 5px;
+         }
+         .popup-section a:hover {
+             text-decoration: underline;
+         }
         .leaflet-tooltip {
             border-radius: 3px;
-            background-color: rgba(50, 50, 50, 0.85); /* Negro semitransparente */
+            background-color: rgba(50, 50, 50, 0.85);
             color: #fdfaf3;
             border: none;
             box-shadow: none;
             padding: 5px 10px;
             font-size: 0.95em;
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Sans-serif para tooltip */
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
-
-        /* Estilo para el control de capas */
         .leaflet-control-layers {
              background-color: #fffef8;
              border: 1px solid #dcd0b8;
@@ -105,44 +117,20 @@
         .leaflet-control-layers-base label, .leaflet-control-layers-overlays label {
             color: #4a3f35;
             font-size: 1em;
+            display: flex;
+            align-items: center;
         }
-        .leaflet-control-layers-separator {
-             border-top: 1px solid #dcd0b8;
-             margin: 5px 0;
-        }
-
-        /* Estilos para MarkerCluster */
-        .marker-cluster-small {
-            background-color: rgba(181, 226, 140, 0.6);
-        }
-        .marker-cluster-small div {
-            background-color: rgba(110, 204, 57, 0.6);
-        }
-        .marker-cluster-medium {
-            background-color: rgba(241, 211, 87, 0.6);
-        }
-        .marker-cluster-medium div {
-            background-color: rgba(240, 194, 12, 0.6);
-        }
-        .marker-cluster-large {
-            background-color: rgba(253, 156, 115, 0.6);
-        }
-        .marker-cluster-large div {
-            background-color: rgba(241, 128, 23, 0.6);
-        }
-        .marker-cluster div {
-            width: 30px;
-            height: 30px;
-            margin-left: 5px;
-            margin-top: 5px;
-            text-align: center;
-            border-radius: 15px;
-            font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
-            color: #fff; /* Color del número */
-            line-height: 30px; /* Centrar número verticalmente */
-            text-shadow: 1px 1px 1px #555; /* Sombra para legibilidad */
-        }
-
+        .leaflet-control-layers-overlays label span { margin-left: 5px; }
+        .leaflet-control-layers-separator { border-top: 1px solid #dcd0b8; margin: 5px 0; }
+        .marker-cluster-small { background-color: rgba(181, 226, 140, 0.6); }
+        .marker-cluster-small div { background-color: rgba(110, 204, 57, 0.6); }
+        .marker-cluster-medium { background-color: rgba(241, 211, 87, 0.6); }
+        .marker-cluster-medium div { background-color: rgba(240, 194, 12, 0.6); }
+        .marker-cluster-large { background-color: rgba(253, 156, 115, 0.6); }
+        .marker-cluster-large div { background-color: rgba(241, 128, 23, 0.6); }
+        .marker-cluster div { width: 30px; height: 30px; margin-left: 5px; margin-top: 5px; text-align: center; border-radius: 15px; font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif; color: #fff; line-height: 30px; text-shadow: 1px 1px 1px #555; }
+        .leaflet-control-custom { background-color: white; border: 1px solid #ccc; border-radius: 4px; width: 30px; height: 30px; text-align: center; line-height: 30px; cursor: pointer; font-weight: bold; font-size: 1.2em; color: #555; }
+        .leaflet-control-custom:hover { background-color: #f4f4f4; }
     </style>
 </head>
 <body>
@@ -153,212 +141,152 @@
     <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
     <script>
-        // --- 1. Inicializar el mapa ---
-        const map = L.map('map', {
-            center: [38.0, 18.0], // Centrado en el Mediterráneo
-            zoom: 5,
-            // Opcional: Limitar zoom/área si se desea
-            // minZoom: 4,
-            // maxBounds: L.latLngBounds(L.latLng(25, -10), L.latLng(50, 40))
-        });
+        // --- 1. Initialize Map ---
+        const map = L.map('map', { center: [38.0, 18.0], zoom: 5 });
 
-        // --- 2. Capas Base (Teselas de Mapa) ---
-        // Opciones de Mapas Base (Permite al usuario elegir)
-        const osmTile = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-            maxZoom: 18,
-        });
-
-        // Ejemplo de Stamen Toner (Blanco y Negro, bueno para datos)
-        const stamenToner = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', {
-            attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-            subdomains: 'abcd',
-            minZoom: 0,
-            maxZoom: 20,
-            ext: 'png'
-        });
-
-        // Ejemplo de Stamen Watercolor (Estilo Acuarela) - ¡Puede ser pesado!
-        const stamenWatercolor = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.{ext}', {
-            attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-            subdomains: 'abcd',
-            minZoom: 1,
-            maxZoom: 16,
-            ext: 'jpg'
-        });
-
-        // *** ¡AQUÍ AÑADIRÍAS TUS TESELAS PERSONALIZADAS SI LAS TUVIERAS! ***
-        // const customTiles = L.tileLayer('URL_DE_TUS_TESELAS/{z}/{x}/{y}.png', { attribution: 'Tu Atribución' });
-
-        // Añadir la capa base por defecto al mapa
+        // --- 2. Base Layers ---
+        const osmTile = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', maxZoom: 18 });
+        const stamenToner = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', { attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', subdomains: 'abcd', minZoom: 0, maxZoom: 20, ext: 'png' });
+        const stamenWatercolor = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.{ext}', { attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', subdomains: 'abcd', minZoom: 1, maxZoom: 16, ext: 'jpg' });
         osmTile.addTo(map);
 
-        // --- 3. Definir Iconos Personalizados (¡CON MARCADORES DE POSICIÓN MEJORADOS!) ---
-        // *** ¡IMPORTANTE! Reemplaza 'iconUrl' con las rutas a TUS propias imágenes SVG/PNG ***
-        const iconBaseSize = [38, 38]; // Tamaño base
-        const iconBaseAnchor = [19, 38]; // Centro-abajo
-        const popupBaseAnchor = [0, -40];
-
+        // --- 3. Define Custom Icons (Placeholders) ---
+        // *** IMPORTANT! Replace 'iconUrl' with paths to YOUR own images ***
+        const iconBaseSize = [38, 38]; const iconBaseAnchor = [19, 38]; const popupBaseAnchor = [0, -40];
         const icons = {
-            // Colores más temáticos y texto descriptivo en placeholder
-            start: L.icon({ iconUrl: 'https://placehold.co/38x38/8B4513/FFFFFF?text=Inicio', iconSize: iconBaseSize, iconAnchor: iconBaseAnchor, popupAnchor: popupBaseAnchor }), // Marrón siena
-            end: L.icon({ iconUrl: 'https://placehold.co/38x38/B22222/FFFFFF?text=Fin', iconSize: iconBaseSize, iconAnchor: iconBaseAnchor, popupAnchor: popupBaseAnchor }), // Rojo ladrillo
-            location: L.icon({ iconUrl: 'https://placehold.co/34x34/4682B4/FFFFFF?text=Lugar', iconSize: [34, 34], iconAnchor: [17, 34], popupAnchor: [0, -36] }), // Azul acero
-            enemy: L.icon({ iconUrl: 'https://placehold.co/42x42/CD5C5C/000000?text=Peligro', iconSize: [42, 42], iconAnchor: [21, 42], popupAnchor: [0, -44] }), // Rojo indio
-            character: L.icon({ iconUrl: 'https://placehold.co/38x38/6A5ACD/FFFFFF?text=Figura', iconSize: iconBaseSize, iconAnchor: iconBaseAnchor, popupAnchor: popupBaseAnchor }), // Púrpura pizarra
-            obstacle: L.icon({ iconUrl: 'https://placehold.co/42x42/FF8C00/FFFFFF?text=Obstaculo', iconSize: [42, 42], iconAnchor: [21, 42], popupAnchor: [0, -44] }), // Naranja oscuro
-            special: L.icon({ iconUrl: 'https://placehold.co/36x36/FFB6C1/000000?text=Sylvanian', iconSize: [36, 36], iconAnchor: [18, 36], popupAnchor: [0, -38] }), // Rosa claro
-            ship: L.icon({ iconUrl: 'https://placehold.co/40x40/5F9EA0/FFFFFF?text=Barco', iconSize: [40, 40], iconAnchor: [20, 20], popupAnchor: [0, -25] }) // Azul cadete
+            start: L.icon({ iconUrl: 'https://placehold.co/38x38/8B4513/FFFFFF?text=Inicio', iconSize: iconBaseSize, iconAnchor: iconBaseAnchor, popupAnchor: popupBaseAnchor }),
+            end: L.icon({ iconUrl: 'https://placehold.co/38x38/B22222/FFFFFF?text=Fin', iconSize: iconBaseSize, iconAnchor: iconBaseAnchor, popupAnchor: popupBaseAnchor }),
+            location: L.icon({ iconUrl: 'https://placehold.co/34x34/4682B4/FFFFFF?text=Lugar', iconSize: [34, 34], iconAnchor: [17, 34], popupAnchor: [0, -36] }),
+            enemy: L.icon({ iconUrl: 'https://placehold.co/42x42/CD5C5C/000000?text=Peligro', iconSize: [42, 42], iconAnchor: [21, 42], popupAnchor: [0, -44] }),
+            character: L.icon({ iconUrl: 'https://placehold.co/38x38/6A5ACD/FFFFFF?text=Figura', iconSize: iconBaseSize, iconAnchor: iconBaseAnchor, popupAnchor: popupBaseAnchor }),
+            obstacle: L.icon({ iconUrl: 'https://placehold.co/42x42/FF8C00/FFFFFF?text=Obstaculo', iconSize: [42, 42], iconAnchor: [21, 42], popupAnchor: [0, -44] }),
+            special: L.icon({ iconUrl: 'https://placehold.co/36x36/FFB6C1/000000?text=Sylvanian', iconSize: [36, 36], iconAnchor: [18, 36], popupAnchor: [0, -38] }),
+            ship: L.icon({ iconUrl: 'https://placehold.co/40x40/5F9EA0/FFFFFF?text=Barco', iconSize: [40, 40], iconAnchor: [20, 20], popupAnchor: [0, -25] }),
+            alternative: L.icon({ iconUrl: 'https://placehold.co/24x24/AAAAAA/FFFFFF?text=Alt', iconSize: [24, 24], iconAnchor: [12, 24], popupAnchor: [0, -26] })
         };
 
-        // --- 4. Datos del Viaje ---
-        // *** AQUÍ PODRÍAS CARGAR ESTOS DATOS DESDE UN JSON EXTERNO O API ***
+        // --- 4. Journey Data (CON CONTENIDO ILUSTRATIVO - VERIFICAR/AMPLIAR PARA PUBLICAR) ---
+        // *** DISCLAIMER: The quotes and notes provided below are illustrative summaries and common interpretations, ***
+        // *** NOT exhaustive or definitive scholarly analysis. Replace/expand with rigorous research for publication. ***
         const journeyPoints = [
-            // Añadimos campos para citas y notas (a rellenar)
-            { name: "Troya", lat: 39.9575, lon: 26.2389, description: "Tras diez años de guerra, Odiseo y sus hombres parten de las ruinas de Troya.", type: 'start', quote: "Placeholder: Cita sobre la partida de Troya...", notes: "Placeholder: Notas sobre la historicidad de Troya..." },
-            { name: "Ismaro (Cícones)", lat: 40.98, lon: 25.53, description: "Primer saqueo y primera pérdida de hombres por exceso de confianza.", type: 'location', quote: "Placeholder: Cita sobre el saqueo de Ismaro...", notes: "Placeholder: Ubicación en Tracia..." },
-            { name: "Tierra de los Lotófagos", lat: 33.8869, lon: 9.5375, description: "El fruto del loto causa el olvido del hogar.", type: 'location', quote: "Placeholder: Cita sobre el loto...", notes: "Placeholder: Posible ubicación Norte de África (Yerba?)..." },
-            { name: "Tierra de los Cíclopes", lat: 37.7510, lon: 14.9934, description: "Encuentro con Polifemo y la astucia de 'Nadie'.", type: 'enemy', quote: "Placeholder: Cita de Polifemo...", notes: "Placeholder: Asociación con Sicilia/Etna..." },
-            { name: "Eolia", lat: 38.53, lon: 14.90, description: "Eolo regala el odre de los vientos.", type: 'location', quote: "Placeholder: Cita sobre Eolo...", notes: "Placeholder: Islas Eolias..." },
-            { name: "Tierra de los Lestrigones", lat: 40.23, lon: 9.67, description: "Gigantes caníbales destruyen casi toda la flota.", type: 'enemy', quote: "Placeholder: Cita sobre los Lestrigones...", notes: "Placeholder: Posible ubicación Cerdeña/Italia..." },
-            { name: "Eea (Circe)", lat: 41.23, lon: 13.08, description: "La hechicera convierte a los hombres en cerdos. Odiseo permanece un año.", type: 'character', quote: "Placeholder: Cita sobre Circe...", notes: "Placeholder: Monte Circeo, Italia..." },
-            { name: "Isla de las Sirenas", lat: 40.58, lon: 14.30, description: "Su canto mortal es resistido gracias a la cera y las ataduras.", type: 'enemy', quote: "Placeholder: Cita sobre las Sirenas...", notes: "Placeholder: Costa SW Italia (¿Islas Galli?)..." },
-            { name: "Escila y Caribdis", lat: 38.24, lon: 15.60, description: "El terrible paso entre el monstruo de seis cabezas y el remolino.", type: 'obstacle', quote: "Placeholder: Cita sobre Escila...", notes: "Placeholder: Estrecho de Mesina..." },
-            { name: "Trinacia", lat: 37.5, lon: 14.0, description: "La tripulación desobedece y come el ganado sagrado de Helios.", type: 'location', quote: "Placeholder: Cita sobre el ganado de Helios...", notes: "Placeholder: Sicilia..." },
-            { name: "Ogigia (Calipso)", lat: 36.05, lon: 14.25, description: "Odiseo es retenido por la ninfa Calipso durante siete años.", type: 'character', quote: "Placeholder: Cita sobre Calipso...", notes: "Placeholder: ¿Malta/Gozo u otra isla occidental?..." },
-            { name: "Esqueria (Feacios)", lat: 39.62, lon: 19.92, description: "Nausícaa y el rey Alcínoo ayudan a Odiseo a regresar.", type: 'location', quote: "Placeholder: Cita sobre los Feacios...", notes: "Placeholder: Asociación con Corfú..." },
-            { name: "Isla Sylvanian", lat: 34.5, lon: 20.0, description: "Una parada inesperada para saludar a las familias Sylvanian.", type: 'special', quote: "Placeholder: ¡Saludos desde el bosque!", notes: "Placeholder: Elemento lúdico añadido." },
-            { name: "Ítaca", lat: 38.37, lon: 20.67, description: "El anhelado regreso al hogar y la lucha contra los pretendientes.", type: 'end', quote: "Placeholder: Cita sobre la llegada a Ítaca...", notes: "Placeholder: Notas sobre la Ítaca homérica vs moderna..." }
+            { name: "Troya", lat: 39.9575, lon: 26.2389, description: "Tras diez años de guerra, Odiseo y sus hombres parten de las ruinas de Troya.", type: 'start', quote: "La alta ciudadela de Príamo destruida, iniciamos el amargo regreso.", notes: "Ubicación: Hisarlik, Turquía. Evidencia arqueológica sugiere destrucción ca. 1200 a.C." },
+            { name: "Ismaro (Cícones)", lat: 40.98, lon: 25.53, description: "Primer saqueo y primera pérdida de hombres por exceso de confianza.", type: 'location', quote: "Saqueamos su ciudad, tomamos mujeres y tesoros, pero la tardanza nos costó cara.", notes: "Costa de Tracia. Refleja prácticas de piratería de la época; primera lección sobre la 'hybris'." },
+            { name: "Tierra de los Lotófagos", lat: 33.8869, lon: 9.5375, description: "El fruto del loto causa el olvido del hogar y el deseo de permanecer.", type: 'location', quote: "Quien probaba aquel fruto dulce como la miel, olvidaba la patria y el regreso.", notes: "Teorías: Isla de Yerba (Túnez) o costa Libia. Símbolo de la tentación del escapismo." },
+            { name: "Tierra de los Cíclopes", lat: 37.7510, lon: 14.9934, description: "Encuentro con el salvaje Polifemo. Odiseo lo ciega usando la astucia ('Nadie').", type: 'enemy', quote: "'¡Nadie, amigos, me mata con engaño y no a la fuerza!' El grito del Cíclope engañado.", notes: "Asociada con Sicilia (volcanes?). La 'hybris' de Odiseo al revelar su nombre atrae la ira de Poseidón." },
+            { name: "Eolia", lat: 38.53, lon: 14.90, description: "Eolo, dios de los vientos, regala un odre con todos los vientos salvo el favorable Céfiro.", type: 'location', quote: "El odre contenía los vientos furiosos; la curiosidad de mis hombres nos alejó de Ítaca.", notes: "Identificada con las Islas Eolias (Lípari/Estrómboli). Tema: la desconfianza y la fragilidad del favor divino." },
+            { name: "Tierra de los Lestrigones", lat: 40.23, lon: 9.67, description: "Gigantes caníbales destruyen 11 de las 12 naves con enormes rocas.", type: 'enemy', quote: "Arrojaban peñascos enormes; mis naves fueron destrozadas, mis hombres devorados.", notes: "Ubicación muy debatida (¿Cerdeña? ¿Formia?). Representa peligros brutales e irracionales." },
+            { name: "Eea (Circe)", lat: 41.23, lon: 13.08, description: "La hechicera convierte a parte de la tripulación en cerdos. Odiseo, ayudado por Hermes, la domina y permanece un año.", type: 'character', quote: "Con su varita los tocó, y en cerdos transformó sus cuerpos, mas no sus mentes.", notes: "Asociada con el Monte Circeo, Italia. Símbolo de la seducción peligrosa, magia, pero también guía (instrucciones para ir al Hades)." },
+            { name: "Isla de las Sirenas", lat: 40.58, lon: 14.30, description: "Su canto promete conocimiento absoluto pero atrae a los marinos a la muerte. Odiseo las escucha atado al mástil.", type: 'enemy', quote: "'Ven, célebre Odiseo... que conocemos todo cuanto ocurrió en la vasta Troya y cuanto sucede en la tierra fecunda.'", notes: "Posibles ubicaciones: ¿Islas Galli? ¿Costa de Sorrento? Representan la tentación mortal del saber total." },
+            { name: "Escila y Caribdis", lat: 38.24, lon: 15.60, description: "El inevitable paso entre el monstruo de seis cabezas (Escila) y el absorbente remolino (Caribdis).", type: 'obstacle', quote: "Era mejor perder seis hombres a garras de Escila que la nave entera en el torbellino de Caribdis.", notes: "Identificación fuerte: Estrecho de Mesina. El dilema trágico, la elección entre dos males." },
+            { name: "Trinacia", lat: 37.5, lon: 14.0, description: "La tripulación hambrienta desobedece la prohibición y sacrifica el ganado sagrado de Helios, el Sol.", type: 'location', quote: "'¡Padre Zeus! ¡Castiga a los compañeros de Odiseo, que han matado mis vacas!'", notes: "Generalmente identificada con Sicilia. La impiedad final de la tripulación sella su destino." },
+            { name: "Ogigia (Calipso)", lat: 36.05, lon: 14.25, description: "Odiseo, único superviviente, es retenido como amante por la ninfa Calipso durante siete años en su remota isla.", type: 'character', quote: "La hermosa ninfa me amaba y cuidaba, deseando hacerme inmortal, pero mi corazón ansiaba Ítaca.", notes: "Debate sobre ubicación (¿Malta/Gozo? ¿Perejil?). Simboliza el estancamiento, la inmortalidad vacía frente a la vida mortal con propósito." },
+            { name: "Esqueria (Feacios)", lat: 39.62, lon: 19.92, description: "Tras naufragar, es ayudado por Nausícaa. Narra sus aventuras al rey Alcínoo, quien finalmente le proporciona una nave para regresar.", type: 'location', quote: "Allí conté mis penas. Los nobles feacios, conmovidos, me prepararon el retorno.", notes: "Fuerte tradición la identifica con Corfú (Kérkyra). Representa una sociedad casi utópica, hospitalaria; el puente final hacia Ítaca." },
+            { name: "Isla Sylvanian", lat: 34.5, lon: 20.0, description: "Una parada inesperada para saludar a las familias Sylvanian.", type: 'special', quote: "'¡Bienvenido, viajero! ¿Un té y pastelitos?'", notes: "Elemento lúdico añadido. No pertenece a la narrativa homérica." },
+            { name: "Ítaca", lat: 38.37, lon: 20.67, description: "El anhelado regreso al hogar. Disfrazado, es reconocido por su perro Argos. Supera la prueba del arco y masacra a los pretendientes.", type: 'end', quote: "Llanto y alegría al pisar por fin su patria tierra, tras veinte años de ausencia.", notes: "Identificada con la moderna Ítaca. Culminación: restauración del orden, identidad recobrada, reunión familiar." }
         ];
 
-        // --- 5. Crear Capas y Agrupación (Clustering) ---
-        const markers = L.markerClusterGroup({ // Inicializar el grupo de clustering
-             spiderfyOnMaxZoom: true, // Abre los marcadores superpuestos al hacer zoom máximo
-             showCoverageOnHover: false, // No mostrar área cubierta por cluster
-             zoomToBoundsOnClick: true // Hacer zoom al cluster al hacer clic
-        });
-
-        // Capas separadas para el control
+        // --- 5. Create Layers and Clustering Group ---
+        const markers = L.markerClusterGroup({ spiderfyOnMaxZoom: true, showCoverageOnHover: false, zoomToBoundsOnClick: true });
         const mainJourneyLayer = L.layerGroup();
         const sylvanianLayer = L.layerGroup();
         const shipLayer = L.layerGroup();
-        let routeLatLngs = []; // Coordenadas para la ruta principal
+        const alternativeLocationsLayer = L.layerGroup();
+        let routeLatLngs = [];
 
-        // --- 6. Procesar Puntos y Añadir a Capas/Clusters ---
+        // --- 6. Process Data Points and Add to Layers/Clusters ---
         journeyPoints.forEach(point => {
             const selectedIcon = icons[point.type] || icons.location;
-
-            // Crear contenido HTML para el popup (con placeholders)
             const popupContent = `
                 <b class="popup-title">${point.name}</b>
-                <p>${point.description}</p>
+                <p>${point.description || 'Descripción no disponible.'}</p>
                 <div class="popup-section">
-                    <h4>Cita Clave:</h4>
-                    <i>${point.quote || 'No disponible.'}</i>
+                    <h4>Cita Clave (Ilustrativa):</h4>
+                    <span class="content-text quote">${point.quote || 'No disponible.'}</span>
                 </div>
                 <div class="popup-section">
-                    <h4>Notas Históricas/Geográficas:</h4>
-                    <i>${point.notes || 'No disponible.'}</i>
+                    <h4>Notas (Ilustrativas):</h4>
+                    <span class="content-text notes">${point.notes || 'No disponible.'}</span>
                 </div>
                 <div class="popup-section">
                     <a href="https://www.google.com/search?q=${encodeURIComponent(point.name + ' Odisea')}" target="_blank" rel="noopener noreferrer">Buscar más información...</a>
                 </div>
             `;
-
-            const marker = L.marker([point.lat, point.lon], {
-                 icon: selectedIcon,
-                 alt: point.name
-            });
-            marker.bindPopup(popupContent);
+            const marker = L.marker([point.lat, point.lon], { icon: selectedIcon, alt: point.name });
+            marker.bindPopup(popupContent, { maxWidth: 350 });
             marker.bindTooltip(point.name);
 
-            // Añadir a la capa correcta Y al cluster si es parte del viaje principal
             if (point.type === 'special') {
-                sylvanianLayer.addLayer(marker); // Añadir Sylvanian a su propia capa
+                sylvanianLayer.addLayer(marker);
             } else {
-                mainJourneyLayer.addLayer(marker); // Añadir a la capa del viaje principal
-                markers.addLayer(marker); // Añadir también al cluster
-                routeLatLngs.push([point.lat, point.lon]); // Añadir a la ruta
+                mainJourneyLayer.addLayer(marker);
+                markers.addLayer(marker);
+                // Solo añadir a la ruta si no es el punto Sylvanian
+                if (point.type !== 'special') {
+                    routeLatLngs.push([point.lat, point.lon]);
+                }
+            }
+            // Add example alternative location marker for Circe
+            if (point.name === 'Eea (Circe)') {
+               const altMarker = L.marker([39.0, 16.0], { icon: icons.alternative, alt: 'Eea Alternativa (¿Cerca de Calabria?)' });
+               altMarker.bindPopup("Teoría alternativa para Eea: Costa de Calabria");
+               alternativeLocationsLayer.addLayer(altMarker);
             }
         });
 
-        // Crear la línea de ruta principal
-        const routeLine = L.polyline(routeLatLngs, {
-            color: 'rgba(139, 69, 19, 0.7)', // Marrón semitransparente
-            weight: 4,
-            dashArray: '8, 8'
-        });//.bindTooltip("Ruta principal de Odiseo (interpretada)"); // Tooltip para la ruta
+        // Create route line excluding Sylvanian point implicitly now
+        const routeLine = L.polyline(routeLatLngs, { color: 'rgba(139, 69, 19, 0.7)', weight: 4, dashArray: '8, 8' });
 
-        // Añadir el marcador del barco a su capa
         if (journeyPoints.length > 0) {
-            const shipMarker = L.marker([journeyPoints[0].lat + 0.15, journeyPoints[0].lon + 0.3], { // Ligeramente desplazado
-                icon: icons.ship,
-                alt: 'Barco de Odiseo'
-            }).addTo(shipLayer); // Añadir a la capa del barco
+            const shipMarker = L.marker([journeyPoints[0].lat + 0.15, journeyPoints[0].lon + 0.3], { icon: icons.ship, alt: 'Barco de Odiseo' });
             shipMarker.bindTooltip("Barco de Odiseo");
+            shipLayer.addLayer(shipMarker);
         }
 
-        // --- 7. Añadir Capas Iniciales y Control ---
-        markers.addTo(map); // Añadir el cluster (que contiene mainJourneyLayer)
-        // mainJourneyLayer.addTo(map); // Alternativa si no quieres clustering inicial
+        // --- 7. Add Initial Layers and Layer Control ---
+        markers.addTo(map);
         routeLine.addTo(map);
         shipLayer.addTo(map);
-        // sylvanianLayer.addTo(map); // Decidir si Sylvanian está visible por defecto
+        // alternativeLocationsLayer.addTo(map); // No visible por defecto
+        // sylvanianLayer.addTo(map); // No visible por defecto
 
-        // Definir capas base y superpuestas para el control
         const baseMaps = {
-            "OpenStreetMap": osmTile,
-            "Stamen Toner Lite": stamenToner,
-            "Stamen Watercolor": stamenWatercolor
-            // "Mapa Antiguo (Custom)": customTiles // Si tuvieras teselas personalizadas
+            "<span>OpenStreetMap</span>": osmTile,
+            "<span>Stamen Toner Lite</span>": stamenToner,
+            "<span>Stamen Watercolor</span>": stamenWatercolor
         };
-
         const overlayMaps = {
-            "Viaje Principal": markers, // Controlar el cluster completo
-            // "Viaje Principal (sin cluster)": mainJourneyLayer, // Opción alternativa
-            "Ruta (Línea)": routeLine,
-            "Barco de Odiseo": shipLayer,
-            "Isla Sylvanian": sylvanianLayer // Capa separada para Sylvanian
-            // "Ubicaciones Alternativas": alternativeLocationsLayer // Si crearas esta capa
+            "<span> Viaje Principal</span>": markers,
+            "<span> Ruta (Línea)</span>": routeLine,
+            "<span> Barco de Odiseo</span>": shipLayer,
+            "<span> Ubicaciones Alternativas</span>": alternativeLocationsLayer,
+            "<span style='color:#FFB6C1;'> Isla Sylvanian</span>": sylvanianLayer
         };
+        // Remove placeholder <i> tags from layer control text for cleaner look
+        Object.keys(overlayMaps).forEach(key => {
+             const cleanKey = key.replace(/<i.*?<\/i>/g, '').replace(/<span.*?>/g, '<span>');
+             if (cleanKey !== key) {
+                 overlayMaps[cleanKey] = overlayMaps[key];
+                 delete overlayMaps[key];
+             }
+        });
 
-        // Añadir control de capas al mapa
-        L.control.layers(baseMaps, overlayMaps, {
-            collapsed: false // Mostrar control expandido inicialmente
-        }).addTo(map);
 
-        // --- 8. Funcionalidad Adicional (Opcional) ---
+        L.control.layers(baseMaps, overlayMaps, { collapsed: false }).addTo(map);
 
-        // Botón simple para centrar el mapa (ejemplo)
+        // --- 8. Additional Functionality ---
         L.Control.Custom = L.Control.extend({
+            options: { position: 'topleft' },
             onAdd: function(map) {
                 var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
-                container.style.backgroundColor = 'white';
-                container.style.width = '30px';
-                container.style.height = '30px';
-                container.style.textAlign = 'center';
-                container.style.lineHeight = '30px';
-                container.style.cursor = 'pointer';
-                container.innerHTML = ' C '; // Icono simple de Centrar
+                container.innerHTML = '&#x21BA;';
                 container.title = 'Centrar Mapa';
-
-                container.onclick = function(e){
-                    e.stopPropagation(); // Evitar que el clic se propague al mapa
-                    map.setView([38.0, 18.0], 5);
-                }
+                L.DomEvent.disableClickPropagation(container);
+                container.onclick = function(){ map.setView([38.0, 18.0], 5); }
                 return container;
-            },
-            onRemove: function(map) { }
+            }
         });
-        new L.Control.Custom({ position: 'topleft' }).addTo(map);
-
-        // *** AQUÍ PODRÍAS AÑADIR CÓDIGO PARA ANIMACIÓN, LÍNEA DE TIEMPO, ETC. ***
-        // Ejemplo: Cargar datos desde JSON
-        // fetch('datos_odisea.json')
-        //    .then(response => response.json())
-        //    .then(data => { /* Procesar datos y crear marcadores */ });
+        new L.Control.Custom().addTo(map);
 
     </script>
 </body>
 </html>
-```
